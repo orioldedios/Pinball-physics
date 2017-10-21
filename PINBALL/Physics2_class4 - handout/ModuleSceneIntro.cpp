@@ -10,7 +10,6 @@
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	circle = box = coin = NULL;
-	ray_on = false;
 	sensed = false;
 }
 
@@ -184,6 +183,30 @@ bool ModuleSceneIntro::Start()
 		229, 426
 	};
 
+	int flipperleft[18] = {
+		3, 1,
+		0, 5,
+		1, 10,
+		37, 25,
+		41, 25,
+		42, 22,
+		40, 19,
+		9, 1,
+		6, 0
+	};
+
+	int flipperright[18] = {
+		42, 3,
+		42, 7,
+		41, 10,
+		5, 25,
+		2, 24,
+		2, 20,
+		30, 3,
+		35, 1,
+		39, 1
+	};
+
 	App->physics->CreateChain(0, 0, background, 66, b2_staticBody);
 	App->physics->CreateChain(0, 0, wall1, 40, b2_staticBody);
 	App->physics->CreateChain(0, 0, wall2, 38, b2_staticBody);
@@ -193,6 +216,8 @@ bool ModuleSceneIntro::Start()
 	App->physics->CreateChain(0, 0, wall6, 20, b2_staticBody);
 	App->physics->CreateChain(0, 0, wall7, 14, b2_staticBody);
 	App->physics->CreateChain(0, 0, wall8, 16, b2_staticBody);
+	App->physics->CreateChain(85, 439, flipperleft, 18, b2_kinematicBody);
+	App->physics->CreateChain(144, 439, flipperright, 18, b2_kinematicBody);
 
 	circles.add(App->physics->CreateCircle(118, 100, 10));
 	circles.add(App->physics->CreateCircle(155, 100, 10));
@@ -203,6 +228,8 @@ bool ModuleSceneIntro::Start()
 	coin_fx = App->audio->LoadFx("pinball/audio/fx/coin.ogg");
 	back = App->textures->Load("pinball/background.png");
 	coin = App->textures->Load("pinball/coin.png");
+	flipperL = App->textures->Load("pinball/flipperleft.png");
+	flipperR = App->textures->Load("pinball/flipperright.png");
 
 	sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT+500, SCREEN_WIDTH, 1000);
 
@@ -222,6 +249,9 @@ update_status ModuleSceneIntro::Update()
 {
 
 	App->renderer->Blit(back, 0, 0);
+	App->renderer->Blit(flipperL, 85, 439);
+	App->renderer->Blit(flipperR, 144, 439);
+
 	if(App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
 	{
 		ray_on = !ray_on;
@@ -242,12 +272,10 @@ update_status ModuleSceneIntro::Update()
 
 	
 
-	// Prepare for raycast ------------------------------------------------------
 	
 	iPoint mouse;
 	mouse.x = App->input->GetMouseX();
 	mouse.y = App->input->GetMouseY();
-	int ray_hit = ray.DistanceTo(mouse);
 
 	fVector normal(0.0f, 0.0f);
 
@@ -261,47 +289,6 @@ update_status ModuleSceneIntro::Update()
 			App->renderer->Blit(ball, x, y, NULL, 1.0f, c->data->GetRotation());
 		c = c->next;
 	}
-
-	c = boxes.getFirst();
-
-	while(c != NULL)
-	{
-		int x, y;
-		c->data->GetPosition(x, y);
-		App->renderer->Blit(box, x, y, NULL, 1.0f, c->data->GetRotation());
-		if(ray_on)
-		{
-			int hit = c->data->RayCast(ray.x, ray.y, mouse.x, mouse.y, normal.x, normal.y);
-			if(hit >= 0)
-				ray_hit = hit;
-		}
-		c = c->next;
-	}
-
-	c = ricks.getFirst();
-
-	while(c != NULL)
-	{
-		int x, y;
-		c->data->GetPosition(x, y);
-		//App->renderer->Blit(rick, x, y, NULL, 1.0f, c->data->GetRotation());
-		c = c->next;
-	}
-
-	// ray -----------------
-	if(ray_on == true)
-	{
-		fVector destination(mouse.x-ray.x, mouse.y-ray.y);
-		destination.Normalize();
-		destination *= ray_hit;
-
-		App->renderer->DrawLine(ray.x, ray.y, ray.x + destination.x, ray.y + destination.y, 255, 255, 255);
-
-		if(normal.x != 0.0f)
-			App->renderer->DrawLine(ray.x + destination.x, ray.y + destination.y, ray.x + destination.x + normal.x * 25.0f, ray.y + destination.y + normal.y * 25.0f, 100, 255, 100);
-	}
-
-	return UPDATE_CONTINUE;
 }
 
 void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
