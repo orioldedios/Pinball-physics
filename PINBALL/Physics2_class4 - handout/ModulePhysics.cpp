@@ -5,6 +5,7 @@
 #include "ModulePhysics.h"
 #include "p2Point.h"
 #include "math.h"
+#include "ModuleSceneIntro.h"
 
 #ifdef _DEBUG
 #pragma comment( lib, "Box2D/libx86/Debug/Box2D.lib" )
@@ -238,9 +239,25 @@ update_status ModulePhysics::PostUpdate()
 				// Draw circles ------------------------------------------------
 				case b2Shape::e_circle:
 				{
+				
+
 					b2CircleShape* shape = (b2CircleShape*)f->GetShape();
 					b2Vec2 pos = f->GetBody()->GetPosition();
-					//App->renderer->DrawCircle(METERS_TO_PIXELS(pos.x), METERS_TO_PIXELS(pos.y), METERS_TO_PIXELS(shape->m_radius), 255, 255, 255);
+
+					if (App->scene_intro->colision_coin[0])
+					{
+						App->renderer->Blit(App->scene_intro->coin, 107, 89);
+					}
+
+					if (App->scene_intro->colision_coin[1])
+					{
+						App->renderer->Blit(App->scene_intro->coin, 144, 89);
+					}
+
+					if (App->scene_intro->colision_coin[2])
+					{
+						App->renderer->Blit(App->scene_intro->coin, 126, 56);
+					}
 				}
 				break;
 

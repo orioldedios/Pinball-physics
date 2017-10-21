@@ -9,7 +9,7 @@
 
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	circle = box = rick = NULL;
+	circle = box = coin = NULL;
 	ray_on = false;
 	sensed = false;
 }
@@ -199,9 +199,10 @@ bool ModuleSceneIntro::Start()
 	circles.add(App->physics->CreateCircle(137, 68, 10));
 
 	box = App->textures->Load("pinball/crate.png");
-	ball = App->textures->Load("pinball/wheel.png"); 
-	bonus_fx = App->audio->LoadFx("pinball/bonus.wav");
+	ball = App->textures->Load("pinball/ball.png"); 
+	coin_fx = App->audio->LoadFx("pinball/audio/fx/coin.ogg");
 	back = App->textures->Load("pinball/background.png");
+	coin = App->textures->Load("pinball/coin.png");
 
 	sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT+500, SCREEN_WIDTH, 1000);
 
@@ -283,7 +284,7 @@ update_status ModuleSceneIntro::Update()
 	{
 		int x, y;
 		c->data->GetPosition(x, y);
-		App->renderer->Blit(rick, x, y, NULL, 1.0f, c->data->GetRotation());
+		//App->renderer->Blit(rick, x, y, NULL, 1.0f, c->data->GetRotation());
 		c = c->next;
 	}
 
@@ -305,12 +306,51 @@ update_status ModuleSceneIntro::Update()
 
 void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 {
-	int x, y;
+	if (bodyA->body->GetFixtureList()->GetShape()->GetType() == 0 && 
+		bodyB->body->GetFixtureList()->GetShape()->GetType() == 0 && 
+		bodyA->body->GetType()==b2_dynamicBody &&
+		bodyB->body->GetType() == b2_staticBody &&
+		METERS_TO_PIXELS(bodyB->body->GetPosition().y ==100) &&
+		METERS_TO_PIXELS(bodyB->body->GetPosition().x < 119))
+	{
+		App->audio->PlayFx(coin_fx);
+		colision_coin[0]=true;
+	}
+	else 
+	{
+		colision_coin[0] = false;
+	}
+	
+	if (bodyA->body->GetFixtureList()->GetShape()->GetType() == 0 &&
+		bodyB->body->GetFixtureList()->GetShape()->GetType() == 0 &&
+		bodyA->body->GetType() == b2_dynamicBody &&
+		bodyB->body->GetType() == b2_staticBody &&
+		METERS_TO_PIXELS(bodyB->body->GetPosition().y == 100) &&
+		METERS_TO_PIXELS(bodyB->body->GetPosition().x > 119))
+	{
+		App->audio->PlayFx(coin_fx);
+		colision_coin[1] = true;
+	}
+	else
+	{
+		colision_coin[1] = false;
+	}
 
-	/*App->audio->PlayFx(bonus_fx);*/
+	if (bodyA->body->GetFixtureList()->GetShape()->GetType() == 0 &&
+		bodyB->body->GetFixtureList()->GetShape()->GetType() == 0 &&
+		bodyA->body->GetType() == b2_dynamicBody &&
+		bodyB->body->GetType() == b2_staticBody &&
+		METERS_TO_PIXELS(bodyB->body->GetPosition().y < 100))
+	{
+		App->audio->PlayFx(coin_fx);
+		colision_coin[2] = true;
+	}
+	else
+	{
+		colision_coin[2] = false;
+	}
 
-	/*
-	if(bodyA)
+	/*if(bodyA)
 	{
 		bodyA->GetPosition(x, y);
 		App->renderer->DrawCircle(x, y, 50, 100, 100, 100);
