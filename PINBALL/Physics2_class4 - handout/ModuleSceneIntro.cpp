@@ -10,6 +10,7 @@
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	circle = box = coin = NULL;
+	ray_on = false;
 	sensed = false;
 }
 
@@ -37,8 +38,8 @@ bool ModuleSceneIntro::Start()
 		246, 349,
 		233, 337,
 		234, 283,
-		254, 222,
-		254, 491,
+		250, 222,
+		250, 491,
 		265, 491,
 		264, 174,
 		271, 134,
@@ -216,15 +217,14 @@ bool ModuleSceneIntro::Start()
 	App->physics->CreateChain(0, 0, wall6, 20, b2_staticBody);
 	App->physics->CreateChain(0, 0, wall7, 14, b2_staticBody);
 	App->physics->CreateChain(0, 0, wall8, 16, b2_staticBody);
-	App->physics->CreateChain(85, 439, flipperleft, 18, b2_kinematicBody);
-	App->physics->CreateChain(144, 439, flipperright, 18, b2_kinematicBody);
+	App->physics->CreateChain(85, 439, flipperleft, 18, b2_dynamicBody);
+	App->physics->CreateChain(144, 439, flipperright, 18, b2_dynamicBody);
 
 	circles.add(App->physics->CreateCircle(118, 100, 10));
 	circles.add(App->physics->CreateCircle(155, 100, 10));
 	circles.add(App->physics->CreateCircle(137, 68, 10));
 
-	box = App->textures->Load("pinball/crate.png");
-	ball = App->textures->Load("pinball/ball.png"); 
+	box = App->textures->Load("pinball/crate.png"); 
 	coin_fx = App->audio->LoadFx("pinball/audio/fx/coin.ogg");
 	back = App->textures->Load("pinball/background.png");
 	coin = App->textures->Load("pinball/coin.png");
@@ -252,50 +252,14 @@ update_status ModuleSceneIntro::Update()
 	App->renderer->Blit(flipperL, 85, 439);
 	App->renderer->Blit(flipperR, 144, 439);
 
-	if(App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
-	{
-		ray_on = !ray_on;
-		ray.x = App->input->GetMouseX();
-		ray.y = App->input->GetMouseY();
-	}
-
-	if(App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
-	{
-		balls.add(App->physics->CreateBall(App->input->GetMouseX(), App->input->GetMouseY(), 6));
-		balls.getLast()->data->listener = this;
-	}
-
-	if(App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
-	{
-		boxes.add(App->physics->CreateRectangle(App->input->GetMouseX(), App->input->GetMouseY(), 100, 50));
-	}
-
-	
-
-	
-	iPoint mouse;
-	mouse.x = App->input->GetMouseX();
-	mouse.y = App->input->GetMouseY();
-
-	fVector normal(0.0f, 0.0f);
-
-	// All draw functions ------------------------------------------------------
-	p2List_item<PhysBody*>* c = balls.getFirst();
-
-	while(c != NULL)
-	{
-		int x, y;
-		c->data->GetPosition(x, y);
-			App->renderer->Blit(ball, x, y, NULL, 1.0f, c->data->GetRotation());
-		c = c->next;
-	}
+	return UPDATE_CONTINUE;
 }
 
 void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 {
 	if (bodyA->body->GetFixtureList()->GetShape()->GetType() == 0 && 
 		bodyB->body->GetFixtureList()->GetShape()->GetType() == 0 && 
-		bodyA->body->GetType()==b2_dynamicBody &&
+		bodyA->body->GetType() == b2_dynamicBody &&
 		bodyB->body->GetType() == b2_staticBody &&
 		METERS_TO_PIXELS(bodyB->body->GetPosition().y ==100) &&
 		METERS_TO_PIXELS(bodyB->body->GetPosition().x < 119))
