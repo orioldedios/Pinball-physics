@@ -194,10 +194,12 @@ bool ModuleSceneIntro::Start()
 	App->physics->CreateChain(0, 0, wall7, 14, b2_staticBody);
 	App->physics->CreateChain(0, 0, wall8, 16, b2_staticBody);
 
+	circles.add(App->physics->CreateCircle(118, 100, 10));
+	circles.add(App->physics->CreateCircle(155, 100, 10));
+	circles.add(App->physics->CreateCircle(137, 68, 10));
 
-	circle = App->textures->Load("pinball/wheel.png"); 
 	box = App->textures->Load("pinball/crate.png");
-	rick = App->textures->Load("pinball/rick_head.png");
+	ball = App->textures->Load("pinball/wheel.png"); 
 	bonus_fx = App->audio->LoadFx("pinball/bonus.wav");
 	back = App->textures->Load("pinball/background.png");
 
@@ -228,8 +230,8 @@ update_status ModuleSceneIntro::Update()
 
 	if(App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
 	{
-		circles.add(App->physics->CreateCircle(App->input->GetMouseX(), App->input->GetMouseY(), 25));
-		circles.getLast()->data->listener = this;
+		balls.add(App->physics->CreateBall(App->input->GetMouseX(), App->input->GetMouseY(), 6));
+		balls.getLast()->data->listener = this;
 	}
 
 	if(App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
@@ -249,14 +251,13 @@ update_status ModuleSceneIntro::Update()
 	fVector normal(0.0f, 0.0f);
 
 	// All draw functions ------------------------------------------------------
-	p2List_item<PhysBody*>* c = circles.getFirst();
+	p2List_item<PhysBody*>* c = balls.getFirst();
 
 	while(c != NULL)
 	{
 		int x, y;
 		c->data->GetPosition(x, y);
-		if(c->data->Contains(App->input->GetMouseX(), App->input->GetMouseY()))
-			App->renderer->Blit(circle, x, y, NULL, 1.0f, c->data->GetRotation());
+			App->renderer->Blit(ball, x, y, NULL, 1.0f, c->data->GetRotation());
 		c = c->next;
 	}
 
