@@ -6,6 +6,7 @@
 #include "ModuleTextures.h"
 #include "ModuleInput.h"
 #include "ModuleSceneIntro.h"
+#include "ModuleFonts.h"
 
 ModulePlayer::ModulePlayer(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -19,6 +20,9 @@ bool ModulePlayer::Start()
 {
 	LOG("Loading player");
 	ball = App->textures->Load("pinball/ball.png");
+	if (font_score == -1)
+		font_score = App->fonts->Load("pinball/Alphabet.png", "0123456789abcdefghiklmnoprstuvwxyq<HIGH=!'·$%&/()-.€@ASD_GHJ", 6);
+
 	return true;
 }
 
@@ -66,6 +70,13 @@ update_status ModulePlayer::Update()
 		App->renderer->Blit(ball, x, y, NULL, 1.0f, c->data->GetRotation());
 		c = c->next;
 	}
+
+	//score
+	sprintf_s(score_text, "%06d", score);
+
+	App->fonts->BlitText(7, 485, font_score, score_text);
+
+
 	return UPDATE_CONTINUE;
 }
 

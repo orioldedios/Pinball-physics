@@ -327,6 +327,9 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	if (bodyA->body->GetFixtureList()->GetShape()->GetType() != 3 &&
 		bodyB->body->GetFixtureList()->GetShape()->GetType() != 3)
 	{
+		//add score
+		App->player->score += 150;
+
 		//coin1
 		if (bodyA->body->GetFixtureList()->GetShape()->GetType() == 0 &&
 			bodyB->body->GetFixtureList()->GetShape()->GetType() == 0 &&
@@ -422,6 +425,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		{
 			sensed_bonus_left = true;
 			App->audio->PlayFx(bonus_left_fx);
+			App->player->score += 10000;
 		}
 		else
 		{
@@ -433,6 +437,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 			bodyB == sensor_bonus_right)
 		{
 			App->audio->PlayFx(bonus_right_fx);
+			App->player->score += 10000;
 		}
 
 		//triangles
