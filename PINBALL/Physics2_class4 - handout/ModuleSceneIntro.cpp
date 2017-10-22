@@ -302,23 +302,21 @@ update_status ModuleSceneIntro::Update()
 	if (sensed_arrow_right[3])
 		App->renderer->Blit(arrow_right, 207, 119);
 
-	//Ball test
-	if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
-	{
-		balls.add(App->physics->CreateBall(App->input->GetMouseX(), App->input->GetMouseY(), 6));
-		balls.getLast()->data->listener = this;
-	}
 
-	// Draw the Ball ------------------------------------------------------
-	p2List_item<PhysBody*>* c = balls.getFirst();
 
-	while (c != NULL)
-	{
-		int x, y;
-		c->data->GetPosition(x, y);
-		App->renderer->Blit(ball, x, y, NULL, 1.0f, c->data->GetRotation());
-		c = c->next;
-	}
+	//// Draw the Ball ------------------------------------------------------
+	//p2List_item<PhysBody*>* c = balls.getFirst();
+
+	//while (c != NULL)
+	//{
+	//	int x, y;
+	//	c->data->GetPosition(x, y);
+	//	App->renderer->Blit(ball, x, y, NULL, 1.0f, c->data->GetRotation());
+	//	c = c->next;
+	//}
+
+	if (App->player->balls.getLast() != nullptr)
+		App->player->balls.getLast()->data->listener = this;
 
 	return UPDATE_CONTINUE;
 }

@@ -33,17 +33,24 @@ bool ModulePlayer::CleanUp()
 // Update: draw background
 update_status ModulePlayer::Update()
 {
+	////Ball test
+	//if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
+	//{
+	//	balls.add(App->physics->CreateBall(App->input->GetMouseX(), App->input->GetMouseY(), 6));
+	//	//balls.getLast()->data->listener = this;
+	//}
+
 	if (ballCreated == false && lifes == 3)
 	{
 		balls.add(App->physics->CreateBall(260, 430, 6));
-		balls.getLast()->data->listener = this;
+		//balls.getLast()->data->listener = this;
 		ballCreated = true;
 	}
 
 	else if (ballCreated == false && lifes < 3 && lifes > 0) 
 	{
 		balls.add(App->physics->CreateBall(260, 430, 6));
-		balls.getLast()->data->listener = this;
+		//balls.getLast()->data->listener = this;
 		ballCreated = true;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
