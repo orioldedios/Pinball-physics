@@ -6,11 +6,12 @@
 #include "ModuleTextures.h"
 #include "ModuleAudio.h"
 #include "ModulePhysics.h"
-#include "ModulePlayer.h"
 
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	circle = box = coin =star=back= arrow_left= arrow_right= flipperL= flipperR= NULL;
+	circle = box = coin = NULL;
+	ray_on = false;
+	sensed = false;
 }
 
 ModuleSceneIntro::~ModuleSceneIntro()
@@ -194,6 +195,7 @@ bool ModuleSceneIntro::Start()
 		9, 1,
 		6, 0
 	};
+
 	int flipperright[18] = {
 		42, 3,
 		42, 7,
@@ -222,41 +224,14 @@ bool ModuleSceneIntro::Start()
 	circles.add(App->physics->CreateCircle(155, 100, 10));
 	circles.add(App->physics->CreateCircle(137, 68, 10));
 
-	box = App->textures->Load("pinball/crate.png");
-	ball = App->textures->Load("pinball/ball.png");
+	box = App->textures->Load("pinball/crate.png"); 
+	coin_fx = App->audio->LoadFx("pinball/audio/fx/coin.ogg");
 	back = App->textures->Load("pinball/background.png");
 	coin = App->textures->Load("pinball/coin.png");
-	star = App->textures->Load("pinball/star.png");
-	arrow_left = App->textures->Load("pinball/arrow_left.png");
-	arrow_right = App->textures->Load("pinball/arrow_right.png");
 	flipperL = App->textures->Load("pinball/flipperleft.png");
 	flipperR = App->textures->Load("pinball/flipperright.png");
 
-	coin_fx = App->audio->LoadFx("pinball/audio/fx/coin.ogg");
-	star_fx = App->audio->LoadFx("pinball/audio/fx/star.wav");
-	bonus_left_fx = App->audio->LoadFx("pinball/audio/fx/bonus_left.ogg");
-	bonus_right_fx = App->audio->LoadFx("pinball/audio/fx/bonus_right.ogg");
-	triangle_fx = App->audio->LoadFx("pinball/audio/fx/triangles.ogg");
-
-	sensor_star[0] = App->physics->CreateRectangleSensor(92, 218, 10, 9);
-	sensor_star[1] = App->physics->CreateRectangleSensor(88, 206, 10, 9);
-	sensor_star[2] = App->physics->CreateRectangleSensor(82, 195, 10, 9);
-
-	sensor_arrow_left[0] = App->physics->CreateRectangleSensor(55, 125, 8, 8);
-	sensor_arrow_left[1] = App->physics->CreateRectangleSensor(60, 113, 10, 9);
-	sensor_arrow_left[2] = App->physics->CreateRectangleSensor(66, 103, 10, 9);
-	sensor_arrow_left[3] = App->physics->CreateRectangleSensor(77, 94, 10, 9);
-
-	sensor_arrow_right[0] = App->physics->CreateRectangleSensor(194, 96, 8, 8);
-	sensor_arrow_right[1] = App->physics->CreateRectangleSensor(204, 105, 10, 9);
-	sensor_arrow_right[2] = App->physics->CreateRectangleSensor(212, 116, 10, 9);
-	sensor_arrow_right[3] = App->physics->CreateRectangleSensor(217, 126, 10, 9);
-
-	sensor_bonus_left = App->physics->CreateRectangleSensor(78, 180, 8, 8);
-	sensor_bonus_right = App->physics->CreateRectangleSensor(185, 200, 8, 8);
-
-	sensor_triangles[0] = App->physics->CreateRectangleSensor(83, 387, 17, 43);
-	sensor_triangles[1] = App->physics->CreateRectangleSensor(186, 387, 17, 43);
+	sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT+500, SCREEN_WIDTH, 1000);
 
 	return ret;
 }
@@ -272,179 +247,69 @@ bool ModuleSceneIntro::CleanUp()
 // Update: draw background
 update_status ModuleSceneIntro::Update()
 {
-	//Blits
+
 	App->renderer->Blit(back, 0, 0);
 	App->renderer->Blit(flipperL, 85, 439);
 	App->renderer->Blit(flipperR, 144, 439);
-
-	if (sensed_star[0])
-		App->renderer->Blit(star, 92, 218);
-	if (sensed_star[1])
-		App->renderer->Blit(star, 88, 206);
-	if (sensed_star[2])
-		App->renderer->Blit(star, 82, 195);
-	if (sensed_bonus_left)
-		App->renderer->Blit(star, 77, 182);
-	if (sensed_arrow_left[0])
-		App->renderer->Blit(arrow_left, 44, 120);
-	if (sensed_arrow_left[1])
-		App->renderer->Blit(arrow_left, 50, 109);
-	if (sensed_arrow_left[2])
-		App->renderer->Blit(arrow_left, 56, 99);
-	if (sensed_arrow_left[3])
-		App->renderer->Blit(arrow_left, 66, 90);
-	if (sensed_arrow_right[0])
-		App->renderer->Blit(arrow_right, 187, 90);
-	if (sensed_arrow_right[1])
-		App->renderer->Blit(arrow_right, 196, 98);
-	if (sensed_arrow_right[2])
-		App->renderer->Blit(arrow_right, 203, 108);
-	if (sensed_arrow_right[3])
-		App->renderer->Blit(arrow_right, 207, 119);
-
-	//Ball test
-	if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
-	{
-		balls.add(App->physics->CreateBall(App->input->GetMouseX(), App->input->GetMouseY(), 6));
-		balls.getLast()->data->listener = this;
-	}
-
-	// Draw the Ball ------------------------------------------------------
-	p2List_item<PhysBody*>* c = balls.getFirst();
-
-	while (c != NULL)
-	{
-		int x, y;
-		c->data->GetPosition(x, y);
-		App->renderer->Blit(ball, x, y, NULL, 1.0f, c->data->GetRotation());
-		c = c->next;
-	}
 
 	return UPDATE_CONTINUE;
 }
 
 void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 {
-	//ignore walls
-	if (bodyA->body->GetFixtureList()->GetShape()->GetType() != 3 &&
-		bodyB->body->GetFixtureList()->GetShape()->GetType() != 3)
+	if (bodyA->body->GetFixtureList()->GetShape()->GetType() == 0 && 
+		bodyB->body->GetFixtureList()->GetShape()->GetType() == 0 && 
+		bodyA->body->GetType() == b2_dynamicBody &&
+		bodyB->body->GetType() == b2_staticBody &&
+		METERS_TO_PIXELS(bodyB->body->GetPosition().y ==100) &&
+		METERS_TO_PIXELS(bodyB->body->GetPosition().x < 119))
 	{
-		//coin1
-		if (bodyA->body->GetFixtureList()->GetShape()->GetType() == 0 &&
-			bodyB->body->GetFixtureList()->GetShape()->GetType() == 0 &&
-			bodyA->body->GetType() == b2_dynamicBody &&
-			bodyB->body->GetType() == b2_staticBody &&
-			METERS_TO_PIXELS(bodyB->body->GetPosition().y == 100) &&
-			METERS_TO_PIXELS(bodyB->body->GetPosition().x < 119))
-		{
-			App->audio->PlayFx(coin_fx);
-			colision_coin[0] = true;
-		}
-		else
-		{
-			colision_coin[0] = false;
-		}
-
-		//coin2
-		if (bodyA->body->GetFixtureList()->GetShape()->GetType() == 0 &&
-			bodyB->body->GetFixtureList()->GetShape()->GetType() == 0 &&
-			bodyA->body->GetType() == b2_dynamicBody &&
-			bodyB->body->GetType() == b2_staticBody &&
-			METERS_TO_PIXELS(bodyB->body->GetPosition().y == 100) &&
-			METERS_TO_PIXELS(bodyB->body->GetPosition().x > 119))
-		{
-			App->audio->PlayFx(coin_fx);
-			colision_coin[1] = true;
-		}
-		else
-		{
-			colision_coin[1] = false;
-		}
-
-		//coin3
-		if (bodyA->body->GetFixtureList()->GetShape()->GetType() == 0 &&
-			bodyB->body->GetFixtureList()->GetShape()->GetType() == 0 &&
-			bodyA->body->GetType() == b2_dynamicBody &&
-			bodyB->body->GetType() == b2_staticBody &&
-			METERS_TO_PIXELS(bodyB->body->GetPosition().y < 100))
-		{
-			App->audio->PlayFx(coin_fx);
-			colision_coin[2] = true;
-		}
-		else
-		{
-			colision_coin[2] = false;
-		}
-
-		//stars
-		for (uint i = 0; i < 3; i++) {
-			if (bodyA == sensor_star[i] ||
-				bodyB == sensor_star[i])
-			{
-				sensed_star[i] = true;
-				App->audio->PlayFx(star_fx);
-			}
-			else
-			{
-				sensed_star[i] = false;
-			}
-		}
-
-		//left_arrows
-		for (uint i = 0; i < 4; i++) {
-			if (bodyA == sensor_arrow_left[i] ||
-				bodyB == sensor_arrow_left[i])
-			{
-				sensed_arrow_left[i] = true;
-				App->audio->PlayFx(star_fx);
-			}
-			else
-			{
-				sensed_arrow_left[i] = false;
-			}
-		}
-
-		//right_arrows
-		for (uint i = 0; i < 4; i++) {
-			if (bodyA == sensor_arrow_right[i] ||
-				bodyB == sensor_arrow_right[i])
-			{
-				sensed_arrow_right[i] = true;
-				App->audio->PlayFx(star_fx);
-			}
-			else
-			{
-				sensed_arrow_right[i] = false;
-			}
-		}
-
-		//bonus_left
-		if (bodyA == sensor_bonus_left ||
-			bodyB == sensor_bonus_left)
-		{
-			sensed_bonus_left = true;
-			App->audio->PlayFx(bonus_left_fx);
-		}
-		else
-		{
-			sensed_bonus_left = false;
-		}
-
-		//bonus_right
-		if (bodyA == sensor_bonus_right ||
-			bodyB == sensor_bonus_right)
-		{
-			App->audio->PlayFx(bonus_right_fx);
-		}
-
-		//triangles
-		for (uint i = 0; i < 2; i++) {
-			if (bodyA == sensor_triangles[i] ||
-				bodyB == sensor_triangles[i])
-			{
-				App->audio->PlayFx(triangle_fx);
-			}
-
-		}
+		App->audio->PlayFx(coin_fx);
+		colision_coin[0]=true;
 	}
+	else 
+	{
+		colision_coin[0] = false;
+	}
+	
+	if (bodyA->body->GetFixtureList()->GetShape()->GetType() == 0 &&
+		bodyB->body->GetFixtureList()->GetShape()->GetType() == 0 &&
+		bodyA->body->GetType() == b2_dynamicBody &&
+		bodyB->body->GetType() == b2_staticBody &&
+		METERS_TO_PIXELS(bodyB->body->GetPosition().y == 100) &&
+		METERS_TO_PIXELS(bodyB->body->GetPosition().x > 119))
+	{
+		App->audio->PlayFx(coin_fx);
+		colision_coin[1] = true;
+	}
+	else
+	{
+		colision_coin[1] = false;
+	}
+
+	if (bodyA->body->GetFixtureList()->GetShape()->GetType() == 0 &&
+		bodyB->body->GetFixtureList()->GetShape()->GetType() == 0 &&
+		bodyA->body->GetType() == b2_dynamicBody &&
+		bodyB->body->GetType() == b2_staticBody &&
+		METERS_TO_PIXELS(bodyB->body->GetPosition().y < 100))
+	{
+		App->audio->PlayFx(coin_fx);
+		colision_coin[2] = true;
+	}
+	else
+	{
+		colision_coin[2] = false;
+	}
+
+	/*if(bodyA)
+	{
+		bodyA->GetPosition(x, y);
+		App->renderer->DrawCircle(x, y, 50, 100, 100, 100);
+	}
+
+	if(bodyB)
+	{
+		bodyB->GetPosition(x, y);
+		App->renderer->DrawCircle(x, y, 50, 100, 100, 100);
+	}*/
 }
