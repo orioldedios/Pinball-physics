@@ -10,7 +10,7 @@
 
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	circle = box = coin =star=back= arrow_left= arrow_right= flipperL= flipperR= NULL;
+	circle = box = coin = star = back = arrow_left = arrow_right = NULL;
 }
 
 ModuleSceneIntro::~ModuleSceneIntro()
@@ -216,8 +216,8 @@ bool ModuleSceneIntro::Start()
 	App->physics->CreateChain(0, 0, wall4, 42, b2_staticBody);
 	App->physics->CreateChain(0, 0, wall5, 18, b2_staticBody);
 	App->physics->CreateChain(0, 0, wall6, 20, b2_staticBody);
-	App->physics->CreateChain(0, 0, wall7, 14, b2_staticBody);
-	App->physics->CreateChain(0, 0, wall8, 16, b2_staticBody);
+	App->player->chainleft = walls.add(App->physics->CreateChain(0, 0, wall7, 14, b2_staticBody));
+	App->player->chainright = walls.add(App->physics->CreateChain(0, 0, wall8, 16, b2_staticBody));
 	App->physics->CreateChain(85, 439, flipperleft, 18, b2_dynamicBody);
 	App->physics->CreateChain(144, 439, flipperright, 18, b2_dynamicBody);
 
@@ -241,14 +241,11 @@ bool ModuleSceneIntro::Start()
 	circles.add(App->physics->CreateCircle(185, 401, 7));
 	circles.add(App->physics->CreateCircle(183, 406, 7));
 
-	ball = App->textures->Load("resources/sprites/ball.png");
 	back = App->textures->Load("resources/sprites/background.png");
 	coin = App->textures->Load("resources/sprites/coin.png");
 	star = App->textures->Load("resources/sprites/star.png");
 	arrow_left = App->textures->Load("resources/sprites/arrow_left.png");
 	arrow_right = App->textures->Load("resources/sprites/arrow_right.png");
-	flipperL = App->textures->Load("resources/sprites/flipperleft.png");
-	flipperR = App->textures->Load("resources/sprites/flipperright.png");
 
 	coin_fx = App->audio->LoadFx("resources/audio/fx/coin.ogg");
 	star_fx = App->audio->LoadFx("resources/audio/fx/star.wav");
@@ -291,26 +288,20 @@ bool ModuleSceneIntro::CleanUp()
 	balls.clear();
 
 	App->textures->Unload(circle);
-	App->textures->Unload(ball);
 	App->textures->Unload(box);
 	App->textures->Unload(coin);
 	App->textures->Unload(star);
 	App->textures->Unload(back);
 	App->textures->Unload(arrow_left);
 	App->textures->Unload(arrow_right);
-	App->textures->Unload(flipperL);
-	App->textures->Unload(flipperR);
 
 	circle = nullptr;
-	ball = nullptr;
 	box = nullptr;
 	coin = nullptr;
 	star = nullptr;
 	back = nullptr;
 	arrow_left = nullptr;
 	arrow_right = nullptr;
-	flipperL = nullptr;
-	flipperR = nullptr;
 
 	coin_fx=0;
 	star_fx = 0;
@@ -327,8 +318,6 @@ update_status ModuleSceneIntro::Update()
 {
 	//Blits
 	App->renderer->Blit(back, 0, 0);
-	App->renderer->Blit(flipperL, 85, 439);
-	App->renderer->Blit(flipperR, 144, 439);
 
 	if (sensed_star[0])
 		App->renderer->Blit(star, 92, 218);

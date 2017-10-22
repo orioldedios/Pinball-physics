@@ -20,6 +20,14 @@ public:
 	SDL_Texture* ball;
 	SDL_Texture* game_over;
 
+	SDL_Texture* flipperL;
+	SDL_Texture* flipperR;
+	PhysBody* FlipperL;
+	PhysBody* FlipperR;
+
+	p2List_item<PhysBody*>* chainleft = nullptr;
+	p2List_item<PhysBody*>* chainright = nullptr;
+
 	int lifes = 3;
 	int font_score = -1;
 

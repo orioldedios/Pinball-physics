@@ -21,6 +21,7 @@ public:
 	p2List<PhysBody*> circles;
 	p2List<PhysBody*> balls;
 	p2List<PhysBody*> ricks;
+	p2List<PhysBody*> walls;
 
 	PhysBody* sensor_star[3];
 	PhysBody* sensor_arrow_left[4];
@@ -39,15 +40,12 @@ public:
 	bool sensed_triangles[2] = { false,false };
 
 	SDL_Texture* circle;
-	SDL_Texture* ball;
 	SDL_Texture* box;
 	SDL_Texture* coin;
 	SDL_Texture* star;
 	SDL_Texture* back;
 	SDL_Texture* arrow_left;
 	SDL_Texture* arrow_right;
-	SDL_Texture* flipperL;
-	SDL_Texture* flipperR;
 
 	uint coin_fx;
 	uint star_fx;

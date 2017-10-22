@@ -25,6 +25,38 @@ bool ModulePlayer::Start()
 	if (font_score == -1)
 		font_score = App->fonts->Load("resources/sprites/Alphabet.png", "0123456789abcdefghiklmnoprstuvwxyq<HIGH=!'·$%&/()-.€@ASD_GHJ", 6);
 
+	flipperL = App->textures->Load("pinball/flipperleft.png");
+	flipperR = App->textures->Load("pinball/flipperright.png");
+
+	int flipperleft[18] = {
+		3, 1,
+		0, 5,
+		1, 10,
+		7, 25,
+		41, 25,
+		42, 22,
+		40, 19,
+		9, 1,
+		6, 0
+	};
+
+
+	int flipperright[18] = {
+		42, 3,
+		42, 7,
+		41, 10,
+		5, 25,
+		2, 24,
+		2, 20,
+		30, 3,
+		35, 1,
+		39, 1
+	};
+
+
+	FlipperL = App->physics->Flipper(flipperleft, 9, -30, chainleft->data);
+	FlipperR = App->physics->Flipper(flipperright, 9, -210, chainright->data);
+
 	return true;
 }
 
@@ -32,6 +64,14 @@ bool ModulePlayer::Start()
 bool ModulePlayer::CleanUp()
 {
 	LOG("Unloading player");
+
+	App->textures->Unload(flipperL);
+	App->textures->Unload(flipperR);
+	App->textures->Unload(ball);
+
+	flipperL = nullptr;
+	flipperR = nullptr;
+	ball = nullptr;
 
 	return true;
 }
@@ -72,6 +112,16 @@ update_status ModulePlayer::Update()
 		score = 0;
 	}
 
+	if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_DOWN)
+	{
+		FlipperL->body->ApplyLinearImpulse({ 0, 2 }, { 0,0 }, true);
+	}
+
+	if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_DOWN)
+	{
+		FlipperR->body->ApplyLinearImpulse({ 0, -2 }, { 0,0 }, true);
+	}
+
 	p2List_item<PhysBody*>* c = balls.getFirst();
 
 	while (c != NULL)
@@ -88,6 +138,10 @@ update_status ModulePlayer::Update()
 
 	App->fonts->BlitText(7, 485, font_score, score_text);
 	App->fonts->BlitText(228, 486, font_score, balls_text);
+
+	//flippers
+	App->renderer->Blit(flipperL, 90, 443);
+	App->renderer->Blit(flipperR, 185, 443);
 
 
 	return UPDATE_CONTINUE;

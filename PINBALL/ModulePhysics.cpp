@@ -6,6 +6,7 @@
 #include "p2Point.h"
 #include "math.h"
 #include "ModuleSceneIntro.h"
+#include "ModulePlayer.h"
 
 #ifdef _DEBUG
 #pragma comment( lib, "Box2D/libx86/Debug/Box2D.lib" )
@@ -215,6 +216,59 @@ PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, b2Body
 	pbody->body = b;
 	b->SetUserData(pbody);
 	pbody->width = pbody->height = 0;
+
+	return pbody;
+}
+
+PhysBody* ModulePhysics::Flipper(int* points, int size, float angle, PhysBody* anchor)
+{
+	b2BodyDef body;
+	body.type = b2_dynamicBody;
+	body.position.Set(0, 0);
+	body.angle = angle * DEGTORAD;
+
+	b2Body* b = App->physics->world->CreateBody(&body);
+	b2PolygonShape shape;
+
+	b2Vec2* p = new b2Vec2[size / 2];
+
+	for (uint i = 0; i < size / 2; ++i)
+	{
+		p[i].x = PIXEL_TO_METERS(points[i * 2 + 0]);
+		p[i].y = PIXEL_TO_METERS(points[i * 2 + 1]);
+	}
+
+	b2FixtureDef fixture;
+	fixture.density = 1.0f;
+	fixture.shape = &shape;
+
+	b->CreateFixture(&fixture);
+
+	PhysBody* pbody = new PhysBody();
+	pbody->body = b;
+	b->SetUserData(pbody);
+	pbody->width = pbody->height = 0;
+
+	b2RevoluteJointDef joint1, joint2;
+	joint1.bodyA = pbody->body;
+	joint1.bodyB = anchor->body;
+	joint1.collideConnected = false;
+
+	joint1.enableLimit = joint2.enableLimit = true;
+
+	if (anchor == App->player->chainleft->data) {
+		joint1.upperAngle = 30 * DEGTORAD;
+		joint1.lowerAngle = -30 * DEGTORAD;
+		joint1.localAnchorA.Set(PIXEL_TO_METERS(90), PIXEL_TO_METERS(443));
+		joint1.localAnchorB.Set(PIXEL_TO_METERS(90), PIXEL_TO_METERS(443));
+	}
+
+	else if (anchor == App->player->chainright->data) {
+		joint1.upperAngle = -150 * DEGTORAD;
+		joint1.lowerAngle = -210 * DEGTORAD;
+		joint1.localAnchorA.Set(PIXEL_TO_METERS(185), PIXEL_TO_METERS(443));
+		joint1.localAnchorB.Set(PIXEL_TO_METERS(185), PIXEL_TO_METERS(443));
+	}
 
 	return pbody;
 }
