@@ -18,14 +18,13 @@ public:
 public:
 	p2List<PhysBody*> balls;
 	SDL_Texture* ball;
+	SDL_Texture* game_over;
 
 	int lifes = 3;
 	int font_score = -1;
 
 	char score_text[10];
+	char balls_text[10];
 
 	uint score = 0;
-
-	bool ballCreated = false;
-
 };

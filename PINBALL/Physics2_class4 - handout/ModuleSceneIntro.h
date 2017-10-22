@@ -28,7 +28,8 @@ public:
 	PhysBody* sensor_bonus_left;
 	PhysBody* sensor_bonus_right;
 	PhysBody* sensor_triangles[2];
-		
+	PhysBody* sensor_lose;
+
 	bool sensed_bonus_left = false;
 	bool sensed_bonus_right = false;
 	bool sensed_star[3] = { false,false,false };
@@ -53,4 +54,5 @@ public:
 	uint bonus_left_fx;
 	uint bonus_right_fx;
 	uint triangle_fx;
+	uint lose_fx;
 };

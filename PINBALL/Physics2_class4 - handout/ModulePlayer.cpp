@@ -20,6 +20,8 @@ bool ModulePlayer::Start()
 {
 	LOG("Loading player");
 	ball = App->textures->Load("pinball/ball.png");
+	game_over = App->textures->Load("pinball/game_over.png");
+
 	if (font_score == -1)
 		font_score = App->fonts->Load("pinball/Alphabet.png", "0123456789abcdefghiklmnoprstuvwxyq<HIGH=!'·$%&/()-.€@ASD_GHJ", 6);
 
@@ -44,23 +46,32 @@ update_status ModulePlayer::Update()
 	//	//balls.getLast()->data->listener = this;
 	//}
 
-	if (ballCreated == false && lifes == 3)
+	if (balls.getFirst()==nullptr && lifes>0)
 	{
 		balls.add(App->physics->CreateBall(260, 430, 6));
 		//balls.getLast()->data->listener = this;
-		ballCreated = true;
+	}
+	else if (lifes == 0)
+	{
+		App->renderer->Blit(game_over, 41, 190);
+		App->fonts->BlitText(136, 244, font_score, score_text);
 	}
 
-	else if (ballCreated == false && lifes < 3 && lifes > 0) 
-	{
-		balls.add(App->physics->CreateBall(260, 430, 6));
-		//balls.getLast()->data->listener = this;
-		ballCreated = true;
-	}
-	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
+	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN &&
+		lifes>0 &&
+		METERS_TO_PIXELS(balls.getFirst()->data->body->GetPosition().x)>255 &&
+		METERS_TO_PIXELS(balls.getFirst()->data->body->GetPosition().y)>217)
 	{
 		balls.getFirst()->data->body->ApplyLinearImpulse({ 0, -2 }, { 0, 0 }, true);
 	}
+
+	if (App->input->GetKey(SDL_SCANCODE_RETURN) == KEY_DOWN &&
+		lifes == 0)
+	{
+		lifes = 3;
+		score = 0;
+	}
+
 	p2List_item<PhysBody*>* c = balls.getFirst();
 
 	while (c != NULL)
@@ -73,8 +84,10 @@ update_status ModulePlayer::Update()
 
 	//score
 	sprintf_s(score_text, "%06d", score);
+	sprintf_s(balls_text, "%01d", lifes);
 
 	App->fonts->BlitText(7, 485, font_score, score_text);
+	App->fonts->BlitText(228, 486, font_score, balls_text);
 
 
 	return UPDATE_CONTINUE;

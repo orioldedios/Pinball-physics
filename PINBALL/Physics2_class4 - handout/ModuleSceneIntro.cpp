@@ -24,6 +24,9 @@ bool ModuleSceneIntro::Start()
 
 	App->renderer->camera.x = App->renderer->camera.y = 0;
 
+	//music
+	App->audio->PlayMusic("pinball/audio/bso/bso.ogg");
+
 	// back_walls
 	int background[66] = {
 		113, 500,
@@ -221,6 +224,22 @@ bool ModuleSceneIntro::Start()
 	circles.add(App->physics->CreateCircle(118, 100, 10));
 	circles.add(App->physics->CreateCircle(155, 100, 10));
 	circles.add(App->physics->CreateCircle(137, 68, 10));
+	circles.add(App->physics->CreateCircle(73, 371, 7));
+	circles.add(App->physics->CreateCircle(75, 376, 7));
+	circles.add(App->physics->CreateCircle(77, 381, 7));
+	circles.add(App->physics->CreateCircle(79, 386, 7));
+	circles.add(App->physics->CreateCircle(81, 391, 7));
+	circles.add(App->physics->CreateCircle(83, 396, 7));
+	circles.add(App->physics->CreateCircle(85, 401, 7));
+	circles.add(App->physics->CreateCircle(87, 406, 7));
+	circles.add(App->physics->CreateCircle(197, 371, 7));
+	circles.add(App->physics->CreateCircle(195, 376, 7));
+	circles.add(App->physics->CreateCircle(193, 381, 7));
+	circles.add(App->physics->CreateCircle(191, 386, 7));
+	circles.add(App->physics->CreateCircle(189, 391, 7));
+	circles.add(App->physics->CreateCircle(187, 396, 7));
+	circles.add(App->physics->CreateCircle(185, 401, 7));
+	circles.add(App->physics->CreateCircle(183, 406, 7));
 
 	box = App->textures->Load("pinball/crate.png");
 	ball = App->textures->Load("pinball/ball.png");
@@ -237,6 +256,7 @@ bool ModuleSceneIntro::Start()
 	bonus_left_fx = App->audio->LoadFx("pinball/audio/fx/bonus_left.ogg");
 	bonus_right_fx = App->audio->LoadFx("pinball/audio/fx/bonus_right.ogg");
 	triangle_fx = App->audio->LoadFx("pinball/audio/fx/triangles.ogg");
+	lose_fx = App->audio->LoadFx("pinball/audio/fx/game_over.ogg");
 
 	sensor_star[0] = App->physics->CreateRectangleSensor(92, 218, 10, 9);
 	sensor_star[1] = App->physics->CreateRectangleSensor(88, 206, 10, 9);
@@ -258,6 +278,8 @@ bool ModuleSceneIntro::Start()
 	sensor_triangles[0] = App->physics->CreateRectangleSensor(83, 387, 17, 43);
 	sensor_triangles[1] = App->physics->CreateRectangleSensor(186, 387, 17, 43);
 
+	sensor_lose= App->physics->CreateRectangleSensor(138, 496, 100, 8);
+
 	return ret;
 }
 
@@ -265,6 +287,38 @@ bool ModuleSceneIntro::Start()
 bool ModuleSceneIntro::CleanUp()
 {
 	LOG("Unloading Intro scene");
+
+	circles.clear();
+	balls.clear();
+
+	App->textures->Unload(circle);
+	App->textures->Unload(ball);
+	App->textures->Unload(box);
+	App->textures->Unload(coin);
+	App->textures->Unload(star);
+	App->textures->Unload(back);
+	App->textures->Unload(arrow_left);
+	App->textures->Unload(arrow_right);
+	App->textures->Unload(flipperL);
+	App->textures->Unload(flipperR);
+
+	circle = nullptr;
+	ball = nullptr;
+	box = nullptr;
+	coin = nullptr;
+	star = nullptr;
+	back = nullptr;
+	arrow_left = nullptr;
+	arrow_right = nullptr;
+	flipperL = nullptr;
+	flipperR = nullptr;
+
+	coin_fx=0;
+	star_fx = 0;
+	bonus_left_fx = 0;
+	bonus_right_fx = 0;
+	triangle_fx = 0;
+	lose_fx = 0;
 
 	return true;
 }
@@ -327,9 +381,6 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	if (bodyA->body->GetFixtureList()->GetShape()->GetType() != 3 &&
 		bodyB->body->GetFixtureList()->GetShape()->GetType() != 3)
 	{
-		//add score
-		App->player->score += 150;
-
 		//coin1
 		if (bodyA->body->GetFixtureList()->GetShape()->GetType() == 0 &&
 			bodyB->body->GetFixtureList()->GetShape()->GetType() == 0 &&
@@ -338,6 +389,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 			METERS_TO_PIXELS(bodyB->body->GetPosition().y == 100) &&
 			METERS_TO_PIXELS(bodyB->body->GetPosition().x < 119))
 		{
+			App->player->score += 300;
 			App->audio->PlayFx(coin_fx);
 			colision_coin[0] = true;
 		}
@@ -354,6 +406,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 			METERS_TO_PIXELS(bodyB->body->GetPosition().y == 100) &&
 			METERS_TO_PIXELS(bodyB->body->GetPosition().x > 119))
 		{
+			App->player->score += 300;
 			App->audio->PlayFx(coin_fx);
 			colision_coin[1] = true;
 		}
@@ -369,6 +422,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 			bodyB->body->GetType() == b2_staticBody &&
 			METERS_TO_PIXELS(bodyB->body->GetPosition().y < 100))
 		{
+			App->player->score += 300;
 			App->audio->PlayFx(coin_fx);
 			colision_coin[2] = true;
 		}
@@ -384,6 +438,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 			{
 				sensed_star[i] = true;
 				App->audio->PlayFx(star_fx);
+				App->player->score += 500;
 			}
 			else
 			{
@@ -398,6 +453,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 			{
 				sensed_arrow_left[i] = true;
 				App->audio->PlayFx(star_fx);
+				App->player->score += 150;
 			}
 			else
 			{
@@ -412,6 +468,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 			{
 				sensed_arrow_right[i] = true;
 				App->audio->PlayFx(star_fx);
+				App->player->score += 150;
 			}
 			else
 			{
@@ -438,6 +495,15 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		{
 			App->audio->PlayFx(bonus_right_fx);
 			App->player->score += 10000;
+		}
+
+		//lose
+		if (bodyA == sensor_lose ||
+			bodyB == sensor_lose)
+		{
+			App->audio->PlayFx(lose_fx);
+			App->player->lifes -= 1;
+			App->player->balls.clear();
 		}
 
 		//triangles
