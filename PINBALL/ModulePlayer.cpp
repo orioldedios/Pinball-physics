@@ -19,11 +19,11 @@ ModulePlayer::~ModulePlayer()
 bool ModulePlayer::Start()
 {
 	LOG("Loading player");
-	ball = App->textures->Load("pinball/ball.png");
-	game_over = App->textures->Load("pinball/game_over.png");
+	ball = App->textures->Load("resources/sprites/ball.png");
+	game_over = App->textures->Load("resources/sprites/game_over.png");
 
 	if (font_score == -1)
-		font_score = App->fonts->Load("pinball/Alphabet.png", "0123456789abcdefghiklmnoprstuvwxyq<HIGH=!'·$%&/()-.€@ASD_GHJ", 6);
+		font_score = App->fonts->Load("resources/sprites/Alphabet.png", "0123456789abcdefghiklmnoprstuvwxyq<HIGH=!'·$%&/()-.€@ASD_GHJ", 6);
 
 	return true;
 }

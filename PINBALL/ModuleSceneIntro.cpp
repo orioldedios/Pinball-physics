@@ -25,7 +25,7 @@ bool ModuleSceneIntro::Start()
 	App->renderer->camera.x = App->renderer->camera.y = 0;
 
 	//music
-	App->audio->PlayMusic("pinball/audio/bso/bso.ogg");
+	App->audio->PlayMusic("resources/audio/bso/bso.ogg");
 
 	// back_walls
 	int background[66] = {
@@ -241,22 +241,21 @@ bool ModuleSceneIntro::Start()
 	circles.add(App->physics->CreateCircle(185, 401, 7));
 	circles.add(App->physics->CreateCircle(183, 406, 7));
 
-	box = App->textures->Load("pinball/crate.png");
-	ball = App->textures->Load("pinball/ball.png");
-	back = App->textures->Load("pinball/background.png");
-	coin = App->textures->Load("pinball/coin.png");
-	star = App->textures->Load("pinball/star.png");
-	arrow_left = App->textures->Load("pinball/arrow_left.png");
-	arrow_right = App->textures->Load("pinball/arrow_right.png");
-	flipperL = App->textures->Load("pinball/flipperleft.png");
-	flipperR = App->textures->Load("pinball/flipperright.png");
+	ball = App->textures->Load("resources/sprites/ball.png");
+	back = App->textures->Load("resources/sprites/background.png");
+	coin = App->textures->Load("resources/sprites/coin.png");
+	star = App->textures->Load("resources/sprites/star.png");
+	arrow_left = App->textures->Load("resources/sprites/arrow_left.png");
+	arrow_right = App->textures->Load("resources/sprites/arrow_right.png");
+	flipperL = App->textures->Load("resources/sprites/flipperleft.png");
+	flipperR = App->textures->Load("resources/sprites/flipperright.png");
 
-	coin_fx = App->audio->LoadFx("pinball/audio/fx/coin.ogg");
-	star_fx = App->audio->LoadFx("pinball/audio/fx/star.wav");
-	bonus_left_fx = App->audio->LoadFx("pinball/audio/fx/bonus_left.ogg");
-	bonus_right_fx = App->audio->LoadFx("pinball/audio/fx/bonus_right.ogg");
-	triangle_fx = App->audio->LoadFx("pinball/audio/fx/triangles.ogg");
-	lose_fx = App->audio->LoadFx("pinball/audio/fx/game_over.ogg");
+	coin_fx = App->audio->LoadFx("resources/audio/fx/coin.ogg");
+	star_fx = App->audio->LoadFx("resources/audio/fx/star.wav");
+	bonus_left_fx = App->audio->LoadFx("resources/audio/fx/bonus_left.ogg");
+	bonus_right_fx = App->audio->LoadFx("resources/audio/fx/bonus_right.ogg");
+	triangle_fx = App->audio->LoadFx("resources/audio/fx/triangles.ogg");
+	lose_fx = App->audio->LoadFx("resources/audio/fx/game_over.ogg");
 
 	sensor_star[0] = App->physics->CreateRectangleSensor(92, 218, 10, 9);
 	sensor_star[1] = App->physics->CreateRectangleSensor(88, 206, 10, 9);
