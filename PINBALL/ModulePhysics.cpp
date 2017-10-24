@@ -110,6 +110,7 @@ PhysBody* ModulePhysics::CreateBall(int x, int y, int radius)
 {
 	b2BodyDef body;
 	body.type = b2_dynamicBody;
+	body.bullet = true;
 	body.position.Set(PIXEL_TO_METERS(x), PIXEL_TO_METERS(y));
 	b2Body* b = world->CreateBody(&body);
 
@@ -220,7 +221,7 @@ PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, b2Body
 	return pbody;
 }
 
-PhysBody* ModulePhysics::Flipper(int* points, int size, float angle, PhysBody* anchor)
+PhysBody* ModulePhysics::CreateFlipper(int* points, int size, float angle, PhysBody* anchor)
 {
 	b2BodyDef body;
 	body.type = b2_dynamicBody;
@@ -238,6 +239,8 @@ PhysBody* ModulePhysics::Flipper(int* points, int size, float angle, PhysBody* a
 		p[i].y = PIXEL_TO_METERS(points[i * 2 + 1]);
 	}
 
+	shape.Set(p, size / 2);
+
 	b2FixtureDef fixture;
 	fixture.density = 1.0f;
 	fixture.shape = &shape;
@@ -247,28 +250,30 @@ PhysBody* ModulePhysics::Flipper(int* points, int size, float angle, PhysBody* a
 	PhysBody* pbody = new PhysBody();
 	pbody->body = b;
 	b->SetUserData(pbody);
-	pbody->width = pbody->height = 0;
 
-	b2RevoluteJointDef joint1, joint2;
+	b2RevoluteJointDef joint1;
 	joint1.bodyA = pbody->body;
-	joint1.bodyB = anchor->body;
+	//joint1.bodyB = anchor->body;
+	joint1.bodyB = CreateRectangle(100, 400, 20, 20)->body;
 	joint1.collideConnected = false;
 
-	joint1.enableLimit = joint2.enableLimit = true;
+	joint1.enableLimit = true;
 
 	if (anchor == App->player->chainleft->data) {
-		joint1.upperAngle = 30 * DEGTORAD;
-		joint1.lowerAngle = -30 * DEGTORAD;
+		joint1.upperAngle = 0 * DEGTORAD;
+		joint1.lowerAngle = 0 * DEGTORAD;
 		joint1.localAnchorA.Set(PIXEL_TO_METERS(90), PIXEL_TO_METERS(443));
-		joint1.localAnchorB.Set(PIXEL_TO_METERS(90), PIXEL_TO_METERS(443));
+		joint1.localAnchorB.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0));
 	}
 
-	else if (anchor == App->player->chainright->data) {
-		joint1.upperAngle = -150 * DEGTORAD;
-		joint1.lowerAngle = -210 * DEGTORAD;
-		joint1.localAnchorA.Set(PIXEL_TO_METERS(185), PIXEL_TO_METERS(443));
-		joint1.localAnchorB.Set(PIXEL_TO_METERS(185), PIXEL_TO_METERS(443));
+	if (anchor == App->player->chainright->data) {
+		joint1.upperAngle = 0 * DEGTORAD;
+		joint1.lowerAngle = 0 * DEGTORAD;
+		joint1.localAnchorA.Set(PIXEL_TO_METERS(145), PIXEL_TO_METERS(442));
+		joint1.localAnchorB.Set(PIXEL_TO_METERS(145), PIXEL_TO_METERS(442));
 	}
+
+	world->CreateJoint(&joint1);
 
 	return pbody;
 }
@@ -342,16 +347,16 @@ update_status ModulePhysics::PostUpdate()
 					b2ChainShape* shape = (b2ChainShape*)f->GetShape();
 					b2Vec2 prev, v;
 
-				/*	for(int32 i = 0; i < shape->m_count; ++i)
+					for(int32 i = 0; i < shape->m_count; ++i)
 					{
 						v = b->GetWorldPoint(shape->m_vertices[i]);
 						if(i > 0)
 							App->renderer->DrawLine(METERS_TO_PIXELS(prev.x), METERS_TO_PIXELS(prev.y), METERS_TO_PIXELS(v.x), METERS_TO_PIXELS(v.y), 100, 255, 100);
 						prev = v;
-					}*/
+					}
 
 					v = b->GetWorldPoint(shape->m_vertices[0]);
-					//App->renderer->DrawLine(METERS_TO_PIXELS(prev.x), METERS_TO_PIXELS(prev.y), METERS_TO_PIXELS(v.x), METERS_TO_PIXELS(v.y), 100, 255, 100);
+					App->renderer->DrawLine(METERS_TO_PIXELS(prev.x), METERS_TO_PIXELS(prev.y), METERS_TO_PIXELS(v.x), METERS_TO_PIXELS(v.y), 100, 255, 100);
 				}
 				break;
 
@@ -367,23 +372,8 @@ update_status ModulePhysics::PostUpdate()
 				}
 				break;
 			}
-
-			// TODO 1: If mouse button 1 is pressed ...
-			// App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN
-			// test if the current body contains mouse position
 		}
 	}
-
-	// If a body was selected we will attach a mouse joint to it
-	// so we can pull it around
-	// TODO 2: If a body was selected, create a mouse joint
-	// using mouse_joint class property
-
-
-	// TODO 3: If the player keeps pressing the mouse button, update
-	// target position and draw a red line between both anchor points
-
-	// TODO 4: If the player releases the mouse button, destroy the joint
 
 	return UPDATE_CONTINUE;
 }

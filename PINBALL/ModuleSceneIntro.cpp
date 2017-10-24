@@ -209,17 +209,19 @@ bool ModuleSceneIntro::Start()
 		39, 1
 	};
 
-	App->physics->CreateChain(0, 0, background, 66, b2_staticBody);
-	App->physics->CreateChain(0, 0, wall1, 40, b2_staticBody);
-	App->physics->CreateChain(0, 0, wall2, 38, b2_staticBody);
-	App->physics->CreateChain(0, 0, wall3, 26, b2_staticBody);
-	App->physics->CreateChain(0, 0, wall4, 42, b2_staticBody);
-	App->physics->CreateChain(0, 0, wall5, 18, b2_staticBody);
-	App->physics->CreateChain(0, 0, wall6, 20, b2_staticBody);
+	walls.add(App->physics->CreateChain(0, 0, background, 66, b2_staticBody));
+	walls.add(App->physics->CreateChain(0, 0, wall1, 40, b2_staticBody));
+	walls.add(App->physics->CreateChain(0, 0, wall2, 38, b2_staticBody));
+	walls.add(App->physics->CreateChain(0, 0, wall3, 26, b2_staticBody));
+	walls.add(App->physics->CreateChain(0, 0, wall4, 42, b2_staticBody));
+	walls.add(App->physics->CreateChain(0, 0, wall5, 18, b2_staticBody));
+	walls.add(App->physics->CreateChain(0, 0, wall6, 20, b2_staticBody));
+
 	App->player->chainleft = walls.add(App->physics->CreateChain(0, 0, wall7, 14, b2_staticBody));
 	App->player->chainright = walls.add(App->physics->CreateChain(0, 0, wall8, 16, b2_staticBody));
-	App->physics->CreateChain(85, 439, flipperleft, 18, b2_dynamicBody);
-	App->physics->CreateChain(144, 439, flipperright, 18, b2_dynamicBody);
+
+	App->player->FlipperL = App->physics->CreateChain(85, 439, flipperleft, 18, b2_dynamicBody);
+	App->player->FlipperR = App->physics->CreateChain(144, 439, flipperright, 18, b2_dynamicBody);
 
 	circles.add(App->physics->CreateCircle(118, 100, 10));
 	circles.add(App->physics->CreateCircle(155, 100, 10));

@@ -28,6 +28,7 @@ public:
 	p2List_item<PhysBody*>* chainleft = nullptr;
 	p2List_item<PhysBody*>* chainright = nullptr;
 
+
 	int lifes = 3;
 	int font_score = -1;
 

@@ -25,8 +25,8 @@ bool ModulePlayer::Start()
 	if (font_score == -1)
 		font_score = App->fonts->Load("resources/sprites/Alphabet.png", "0123456789abcdefghiklmnoprstuvwxyq<HIGH=!'·$%&/()-.€@ASD_GHJ", 6);
 
-	flipperL = App->textures->Load("pinball/flipperleft.png");
-	flipperR = App->textures->Load("pinball/flipperright.png");
+	flipperL = App->textures->Load("resources/sprites/flipperleft.png");
+	flipperR = App->textures->Load("resources/sprites/flipperright.png");
 
 	int flipperleft[18] = {
 		3, 1,
@@ -54,8 +54,8 @@ bool ModulePlayer::Start()
 	};
 
 
-	FlipperL = App->physics->Flipper(flipperleft, 9, -30, chainleft->data);
-	FlipperR = App->physics->Flipper(flipperright, 9, -210, chainright->data);
+	FlipperL = App->physics->CreateFlipper(flipperleft, 9, -30, chainleft->data);
+	FlipperR = App->physics->CreateFlipper(flipperright, 9, -210, chainright->data);
 
 	return true;
 }
@@ -139,9 +139,11 @@ update_status ModulePlayer::Update()
 	App->fonts->BlitText(7, 485, font_score, score_text);
 	App->fonts->BlitText(228, 486, font_score, balls_text);
 
-	//flippers
-	App->renderer->Blit(flipperL, 90, 443);
-	App->renderer->Blit(flipperR, 185, 443);
+	App->renderer->Blit(flipperL, 90, 443, NULL, 1.0f, FlipperL->GetRotation());
+
+	App->renderer->Blit(flipperR, 145, 443, NULL, 1.0f, FlipperR->GetRotation());
+
+
 
 
 	return UPDATE_CONTINUE;
