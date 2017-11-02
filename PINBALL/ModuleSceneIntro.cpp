@@ -186,32 +186,6 @@ bool ModuleSceneIntro::Start()
 		229, 426
 	};
 
-<<<<<<< HEAD
-=======
-	int flipperleft[18] = {
-		3, 1,
-		0, 5,
-		1, 10,
-		37, 25,
-		41, 25,
-		42, 22,
-		40, 19,
-		9, 1,
-		6, 0
-	};
-	int flipperright[18] = {
-		42, 3,
-		42, 7,
-		41, 10,
-		5, 25,
-		2, 24,
-		2, 20,
-		30, 3,
-		35, 1,
-		39, 1
-	};
-
->>>>>>> parent of 1464912... All completed
 	App->physics->CreateChain(0, 0, background, 66, b2_staticBody);
 	App->physics->CreateChain(0, 0, wall1, 40, b2_staticBody);
 	App->physics->CreateChain(0, 0, wall2, 38, b2_staticBody);
@@ -219,16 +193,8 @@ bool ModuleSceneIntro::Start()
 	App->physics->CreateChain(0, 0, wall4, 42, b2_staticBody);
 	App->physics->CreateChain(0, 0, wall5, 18, b2_staticBody);
 	App->physics->CreateChain(0, 0, wall6, 20, b2_staticBody);
-<<<<<<< HEAD
 	walls.add(App->physics->CreateChain(0, 0, wall7, 14, b2_staticBody));
 	walls.add(App->physics->CreateChain(0, 0, wall8, 16, b2_staticBody));
-
-=======
-	App->player->chainleft = walls.add(App->physics->CreateChain(0, 0, wall7, 14, b2_staticBody));
-	App->player->chainright = walls.add(App->physics->CreateChain(0, 0, wall8, 16, b2_staticBody));
-	App->physics->CreateChain(85, 439, flipperleft, 18, b2_dynamicBody);
-	App->physics->CreateChain(144, 439, flipperright, 18, b2_dynamicBody);
->>>>>>> parent of 1464912... All completed
 
 	circles.add(App->physics->CreateCircle(118, 100, 10));
 	circles.add(App->physics->CreateCircle(155, 100, 10));

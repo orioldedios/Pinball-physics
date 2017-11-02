@@ -25,8 +25,8 @@ public:
 	PhysBody* FlipperL;
 	PhysBody* FlipperR;
 
-	p2List_item<PhysBody*>* chainleft = nullptr;
-	p2List_item<PhysBody*>* chainright = nullptr;
+	PhysBody* anchorleft;
+	PhysBody* anchorright;
 
 
 	int lifes = 3;
