@@ -28,6 +28,7 @@ public:
 	PhysBody* anchorleft;
 	PhysBody* anchorright;
 
+
 	int lifes = 3;
 	int font_score = -1;
 

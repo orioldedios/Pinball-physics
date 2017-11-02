@@ -28,6 +28,7 @@ bool ModulePlayer::Start()
 	flipperL = App->textures->Load("resources/sprites/flipperleft.png");
 	flipperR = App->textures->Load("resources/sprites/flipperright.png");
 
+
 	int flipperleft[14] = {
 		103, 443,
 		98, 443,
@@ -55,6 +56,7 @@ bool ModulePlayer::Start()
 
 	FlipperL = App->physics->CreateFlipper(flipperleft, 14, 0, anchorleft);
 	FlipperR = App->physics->CreateFlipper(flipperright, 14, 0, anchorright);
+
 
 	return true;
 }
@@ -138,9 +140,11 @@ update_status ModulePlayer::Update()
 	App->fonts->BlitText(7, 485, font_score, score_text);
 	App->fonts->BlitText(228, 486, font_score, balls_text);
 
+
 	//flippers
 	App->renderer->Blit(flipperL, 96, 443, NULL, 1, FlipperL->GetRotation(), PIXEL_TO_METERS(110), PIXEL_TO_METERS(447));
 	App->renderer->Blit(flipperR, 146, 442, NULL, 1, FlipperR->GetRotation(), PIXEL_TO_METERS(1450), PIXEL_TO_METERS(420));
+
 
 
 	return UPDATE_CONTINUE;

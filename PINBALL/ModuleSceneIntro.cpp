@@ -186,26 +186,6 @@ bool ModuleSceneIntro::Start()
 		229, 426
 	};
 
-	/*int flipperleft[14] = {
-		103, 443,
-		98, 443,
-		96, 447,
-		97, 452,
-		126, 464,
-		130, 462,
-		130, 459
-	};
-
-	int flipperright[14] = {
-		147, 458,
-		147, 462,
-		151, 463,
-		179, 451,
-		180, 447,
-		178, 442,
-		173, 442
-	};*/
-
 	App->physics->CreateChain(0, 0, background, 66, b2_staticBody);
 	App->physics->CreateChain(0, 0, wall1, 40, b2_staticBody);
 	App->physics->CreateChain(0, 0, wall2, 38, b2_staticBody);
@@ -215,8 +195,7 @@ bool ModuleSceneIntro::Start()
 	App->physics->CreateChain(0, 0, wall6, 20, b2_staticBody);
 	walls.add(App->physics->CreateChain(0, 0, wall7, 14, b2_staticBody));
 	walls.add(App->physics->CreateChain(0, 0, wall8, 16, b2_staticBody));
-	/*App->physics->CreateChain(96, 443, flipperleft, 14, b2_dynamicBody);
-	App->physics->CreateChain(146, 442, flipperright, 14, b2_dynamicBody);*/
+
 
 	circles.add(App->physics->CreateCircle(118, 100, 10));
 	circles.add(App->physics->CreateCircle(155, 100, 10));

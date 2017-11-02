@@ -110,6 +110,7 @@ PhysBody* ModulePhysics::CreateBall(int x, int y, int radius)
 {
 	b2BodyDef body;
 	body.type = b2_dynamicBody;
+	body.bullet = true;
 	body.position.Set(PIXEL_TO_METERS(x), PIXEL_TO_METERS(y));
 	b2Body* b = world->CreateBody(&body);
 	body.bullet = true;
@@ -251,14 +252,15 @@ PhysBody* ModulePhysics::CreateFlipper(int* points, int size, float angle, PhysB
 	PhysBody* pbody = new PhysBody();
 	pbody->body = b;
 	b->SetUserData(pbody);
-	pbody->width = pbody->height = 0;
 
 	b2RevoluteJointDef joint1;
 	joint1.bodyA = pbody->body;
-	joint1.bodyB = anchor->body;
+	//joint1.bodyB = anchor->body;
+	joint1.bodyB = CreateRectangle(100, 400, 20, 20)->body;
 	joint1.collideConnected = false;
 
 	joint1.enableLimit = true;
+
 
 	if (anchor == App->player->anchorleft) {
 		joint1.upperAngle = 75 * DEGTORAD;
@@ -270,6 +272,7 @@ PhysBody* ModulePhysics::CreateFlipper(int* points, int size, float angle, PhysB
 		joint1.upperAngle = 0 * DEGTORAD;
 		joint1.lowerAngle = -75 * DEGTORAD;
 		joint1.localAnchorA.Set(PIXEL_TO_METERS(176), PIXEL_TO_METERS(446));
+
 	}
 
 	world->CreateJoint(&joint1);
