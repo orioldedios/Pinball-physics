@@ -25,6 +25,7 @@ bool ModulePlayer::Start()
 	if (font_score == -1)
 		font_score = App->fonts->Load("resources/sprites/Alphabet.png", "0123456789abcdefghiklmnoprstuvwxyq<HIGH=!'·$%&/()-.€@ASD_GHJ", 6);
 
+<<<<<<< HEAD
 	flipperL = App->textures->Load("resources/sprites/flipperleft.png");
 	flipperR = App->textures->Load("resources/sprites/flipperright.png");
 
@@ -37,25 +38,39 @@ bool ModulePlayer::Start()
 		126, 464,
 		130, 462,
 		130, 459
+=======
+	flipperL = App->textures->Load("pinball/flipperleft.png");
+	flipperR = App->textures->Load("pinball/flipperright.png");
+
+	int flipperleft[18] = {
+		3, 1,
+		0, 5,
+		1, 10,
+		7, 25,
+		41, 25,
+		42, 22,
+		40, 19,
+		9, 1,
+		6, 0
+>>>>>>> parent of 1464912... All completed
 	};
 
 
-	int flipperright[14] = {
-		147, 458,
-		147, 462,
-		151, 463,
-		179, 451,
-		180, 447,
-		178, 442,
-		173, 442
+	int flipperright[18] = {
+		42, 3,
+		42, 7,
+		41, 10,
+		5, 25,
+		2, 24,
+		2, 20,
+		30, 3,
+		35, 1,
+		39, 1
 	};
 
-	anchorleft = App->physics->CreateCircle(100, 447, 1);
-	anchorright = App->physics->CreateCircle(176, 446, 1);
 
-
-	FlipperL = App->physics->CreateFlipper(flipperleft, 14, 0, anchorleft);
-	FlipperR = App->physics->CreateFlipper(flipperright, 14, 0, anchorright);
+	FlipperL = App->physics->Flipper(flipperleft, 9, -30, chainleft->data);
+	FlipperR = App->physics->Flipper(flipperright, 9, -210, chainright->data);
 
 
 	return true;
@@ -113,14 +128,14 @@ update_status ModulePlayer::Update()
 		score = 0;
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT)
+	if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_DOWN)
 	{
-		FlipperL->body->ApplyLinearImpulse({ 0, 1 }, { 0,0 }, true);
+		FlipperL->body->ApplyLinearImpulse({ 0, 2 }, { 0,0 }, true);
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT)
+	if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_DOWN)
 	{
-		FlipperR->body->ApplyLinearImpulse({ 0, -1 }, { 0,0 }, true);
+		FlipperR->body->ApplyLinearImpulse({ 0, -2 }, { 0,0 }, true);
 	}
 
 	p2List_item<PhysBody*>* c = balls.getFirst();
@@ -142,8 +157,8 @@ update_status ModulePlayer::Update()
 
 
 	//flippers
-	App->renderer->Blit(flipperL, 96, 443, NULL, 1, FlipperL->GetRotation(), PIXEL_TO_METERS(110), PIXEL_TO_METERS(447));
-	App->renderer->Blit(flipperR, 146, 442, NULL, 1, FlipperR->GetRotation(), PIXEL_TO_METERS(1450), PIXEL_TO_METERS(420));
+	App->renderer->Blit(flipperL, 90, 443);
+	App->renderer->Blit(flipperR, 185, 443);
 
 
 
